@@ -86,3 +86,143 @@ body {
 .error-message button:hover {
   background: #1d4ed8;
 }
+
+/* Admin Layout Styles */
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-header {
+  background: #1e293b;
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.home-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.home-link:hover {
+  color: white;
+}
+
+.admin-nav {
+  background: #334155;
+  padding: 0;
+  border-bottom: 1px solid #475569;
+}
+
+.admin-nav {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  color: #94a3b8;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: white;
+  background: #475569;
+}
+
+.nav-link.active {
+  color: white;
+  border-bottom-color: #3b82f6;
+  background: #475569;
+}
+
+.admin-main {
+  flex: 1;
+  background: #f8fafc;
+  padding: 2rem;
+}
+
+.admin-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.admin-link:hover {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header-nav {
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-header-content {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .admin-nav {
+    padding: 0 1rem;
+    flex-direction: column;
+  }
+  
+  .nav-link {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #475569;
+    border-radius: 0;
+  }
+  
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+  
+  .admin-main {
+    padding: 1rem;
+  }
+  
+  .app-main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .sidebar {
+    flex: none;
+    position: static;
+  }
+}
