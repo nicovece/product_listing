@@ -1,0 +1,39 @@
+{
+  "name": "product-catalog-api",
+  "version": "1.0.0",
+  "description": "Product catalog API with filtering, sorting, and pagination",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "seed": "node src/database/seed.js",
+    "reset-db": "rm -f products.db && npm run seed",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/database/seed.js"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  },
+  "keywords": ["product", "api", "sqlite", "express", "catalog"],
+  "author": "",
+  "license": "MIT"
+}

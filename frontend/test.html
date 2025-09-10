@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog Test</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .sidebar {
+            flex: 0 0 280px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .content {
+            flex: 1;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 1rem;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #059669;
+        }
+        
+        .product-likes {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .filter-input, .filter-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .price-inputs {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .price-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+        
+        .pagination {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .pagination button {
+            margin: 0 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #f3f4f6;
+        }
+        
+        .pagination button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .clear-button {
+            width: 100%;
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .clear-button:hover {
+            background: #b91c1c;
+        }
+        
+        .results-info {
+            margin-bottom: 1rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Product Catalog</h1>
+        <p>Browse our collection with filtering and sorting</p>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <h3 style="margin-bottom: 1rem;">Filters</h3>
+            
+            <div class="filter-group">
+                <label class="filter-label">Search Products</label>
+                <input type="text" id="searchInput" class="filter-input" placeholder="Enter product name...">
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Price Range</label>
+                <div class="price-inputs">
+                    <input type="number" id="priceMin" class="price-input" placeholder="Min ($)">
+                    <span>to</span>
+                    <input type="number" id="priceMax" class="price-input" placeholder="Max ($)">
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select id="sortSelect" class="filter-select">
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="price_asc">Price (Low to High)</option>
+                    <option value="price_desc">Price (High to Low)</option>
+                    <option value="likes_desc">Most Liked</option>
+                    <option value="likes_asc">Least Liked</option>
+                </select>
+            </div>
+            
+            <button id="clearFilters" class="clear-button">Clear All Filters</button>
+        </div>
+
+        <div class="content">
+            <div id="resultsInfo" class="results-info"></div>
+            <div id="productsContainer" class="products-grid"></div>
+            <div id="paginationContainer" class="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilters = {
+            page: 1,
+            limit: 25,
+            search: '',
+            priceMin: '',
+            priceMax: '',
+            sortBy: 'name',
+            sortOrder: 'asc'
+        };
+        
+        let debounceTimeout;
+
+        // Fetch products from API
+        async function fetchProducts() {
+            try {
+                document.getElementById('productsContainer').innerHTML = '<div class="loading">Loading products...</div>';
+                
+                const params = new URLSearchParams();
+                Object.entries(currentFilters).forEach(([key, value]) => {
+                    if (value && value !== '') {
+                        params.append(key, value);
+                    }
+                });
+
+                const response = await fetch(`/api/products?${params}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                renderProducts(data.products);
+                renderPagination(data.pagination);
+                renderResultsInfo(data.pagination);
+
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById('productsContainer').innerHTML = 
+                    '<div class="loading">Error loading products. Make sure the backend server is running.</div>';
+            }
+        }
+
+        // Render products
+        function renderProducts(products) {
+            const container = document.getElementById('productsContainer');
+            
+            if (products.length === 0) {
+                container.innerHTML = '<div class="loading">No products found matching your filters.</div>';
+                return;
+            }
+
+            container.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <img src="${product.imageUrl}" alt="${product.name}" class="product-image" 
+                         onerror="this.src='https://via.placeholder.com/300x300/e5e7eb/6b7280?text=${encodeURIComponent(product.name)}'">
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-details">
+                            <div class="product-price">$${product.price.toFixed(2)}</div>
+                            <div class="product-likes">❤️ ${product.likes.toLocaleString()} likes</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render pagination
+        function renderPagination(pagination) {
+            const container = document.getElementById('paginationContainer');
+            const { currentPage, totalPages } = pagination;
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let buttons = [];
+            
+            // Previous button
+            buttons.push(`
+                <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+                    ← Previous
+                </button>
+            `);
+
+            // Page numbers (show current ±2)
+            const start = Math.max(1, currentPage - 2);
+            const end = Math.min(totalPages, currentPage + 2);
+
+            if (start > 1) {
+                buttons.push(`<button onclick="changePage(1)">1</button>`);
+                if (start > 2) buttons.push('<span>...</span>');
+            }
+
+            for (let i = start; i <= end; i++) {
+                buttons.push(`
+                    <button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `);
+            }
+
+            if (end < totalPages) {
+                if (end < totalPages - 1) buttons.push('<span>...</span>');
+                buttons.push(`<button onclick="changePage(${totalPages})">${totalPages}</button>`);
+            }
+
+            // Next button
+            buttons.push(`
+                <button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+                    Next →
+                </button>
+            `);
+
+            container.innerHTML = buttons.join('');
+        }
+
+        // Render results info
+        function renderResultsInfo(pagination) {
+            const start = ((pagination.currentPage - 1) * pagination.itemsPerPage) + 1;
+            const end = Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems);
+            document.getElementById('resultsInfo').innerHTML = 
+                `Showing ${start}-${end} of ${pagination.totalItems} products`;
+        }
+
+        // Change page
+        function changePage(page) {
+            currentFilters.page = page;
+            fetchProducts();
+        }
+
+        // Apply filters with debouncing
+        function applyFilters() {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                currentFilters.page = 1; // Reset to first page when filtering
+                fetchProducts();
+            }, 300);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentFilters.search = e.target.value;
+            applyFilters();
+        });
+
+        document.getElementById('priceMin').addEventListener('input', (e) => {
+            currentFilters.priceMin = e.target.value;
+            applyFilters();
+        });
+
+        document.getElementById('priceMax').addEventListener('input', (e) => {
+            currentFilters.priceMax = e.target.value;
+            applyFilters();
+        });
+
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            const [field, order] = e.target.value.split('_');
+            currentFilters.sortBy = field;
+            currentFilters.sortOrder = order;
+            applyFilters();
+        });
+
+        document.getElementById('clearFilters').addEventListener('click', () => {
+            currentFilters = {
+                page: 1,
+                limit: 25,
+                search: '',
+                priceMin: '',
+                priceMax: '',
+                sortBy: 'name',
+                sortOrder: 'asc'
+            };
+            
+            document.getElementById('searchInput').value = '';
+            document.getElementById('priceMin').value = '';
+            document.getElementById('priceMax').value = '';
+            document.getElementById('sortSelect').value = 'name_asc';
+            
+            fetchProducts();
+        });
+
+        // Initial load
+        fetchProducts();
+    </script>
+</body>
+</html>
