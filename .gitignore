@@ -65,7 +65,14 @@ tmp/
 temp/
 
 # Claude Code specific
-.claude/settings.local.json
+.claude/
+
+# Spec-Driven Development framework files
+CLAUDE.md
+specs/
+templates/
+scripts/
+memory/
 
 # Keep the SQLite database for demo purposes
 # products.db is intentionally included
