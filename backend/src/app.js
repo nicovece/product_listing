@@ -4,12 +4,17 @@ const path = require('path');
 
 // Import routes
 const productsRouter = require('./routes/products');
+const adminProductsRouter = require('./routes/admin/products');
+const adminCategoriesRouter = require('./routes/admin/categories');
+
+// Import middleware
+const { sanitizeInput, createRateLimit, handleValidationErrors } = require('./middleware/validation');
 
 const app = express();
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS configuration
 app.use(cors({
@@ -17,13 +22,29 @@ app.use(cors({
   credentials: true
 }));
 
-// Routes
+// Security middleware
+app.use(sanitizeInput());
+
+// Rate limiting for admin endpoints
+app.use('/api/admin', createRateLimit(15 * 60 * 1000, 200)); // 200 requests per 15 minutes
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Public routes
 app.use('/api/products', productsRouter);
+
+// Admin routes
+app.use('/api/admin/products', adminProductsRouter);
+app.use('/api/admin/categories', adminCategoriesRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Validation error handling middleware
+app.use(handleValidationErrors);
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -48,8 +69,11 @@ const PORT = process.env.PORT || 3001;
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📊 API available at http://localhost:${PORT}/api/products`);
-    console.log(`❤️  Health check at http://localhost:${PORT}/health`);
+    console.log(`📊 Public API: http://localhost:${PORT}/api/products`);
+    console.log(`🔐 Admin API: http://localhost:${PORT}/api/admin/products`);
+    console.log(`📂 Categories API: http://localhost:${PORT}/api/admin/categories`);
+    console.log(`📁 File uploads: http://localhost:${PORT}/uploads`);
+    console.log(`❤️  Health check: http://localhost:${PORT}/health`);
   });
 }
 
