@@ -1,6 +1,6 @@
 # Product Listing Application
 
-A full-stack product catalog application built with React frontend and Node.js backend, featuring real-time search, filtering, sorting, and pagination.
+A full-stack product catalog application built with React frontend and Node.js backend, featuring real-time search, filtering, sorting, and pagination. This app has been used to check out "Spec Kit".
 
 ## 🚀 Features
 
