@@ -1,12 +1,21 @@
-app = 'product-listing'
-primary_region = 'mad'
+# fly.toml app configuration file generated for product-listing-shy-fog-6441 on 2026-03-23T14:11:18+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'product-listing-shy-fog-6441'
+primary_region = 'fra'
 
 [build]
 
 [env]
+  DATABASE_PATH = '/data/products.db'
   NODE_ENV = 'production'
   PORT = '3001'
-  DATABASE_PATH = '/data/products.db'
+
+[[mounts]]
+  source = 'data'
+  destination = '/data'
 
 [http_service]
   internal_port = 3001
@@ -15,11 +24,5 @@ primary_region = 'mad'
   auto_start_machines = true
   min_machines_running = 0
 
-[mounts]
-  source = 'data'
-  destination = '/data'
-
 [[vm]]
-  memory = '256mb'
-  cpu_kind = 'shared'
-  cpus = 1
+  size = 'shared-cpu-1x'

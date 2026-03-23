@@ -75,7 +75,7 @@ const PORT = process.env.PORT || 3001;
 
 // Start server (only if this file is run directly)
 if (require.main === module) {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`📊 Public API: http://localhost:${PORT}/api/products`);
     console.log(`🔐 Admin API: http://localhost:${PORT}/api/admin/products`);

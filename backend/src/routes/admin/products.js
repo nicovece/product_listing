@@ -49,6 +49,73 @@ router.get('/',
   }
 );
 
+// GET /api/admin/products/stats/inventory - Get inventory statistics
+// NOTE: Static routes must be defined before /:id to avoid being matched as an id param
+router.get('/stats/inventory', async (req, res) => {
+  try {
+    const stats = ProductManagement.getInventoryStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching inventory stats:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch inventory statistics'
+    });
+  }
+});
+
+// GET /api/admin/products/low-stock - Get low stock products
+router.get('/low-stock', async (req, res) => {
+  try {
+    const threshold = req.query.threshold ? parseInt(req.query.threshold) : 5;
+    const products = Product.getLowStockProducts(threshold);
+
+    res.json({
+      data: products,
+      threshold,
+      total: products.length
+    });
+  } catch (error) {
+    console.error('Error fetching low stock products:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch low stock products'
+    });
+  }
+});
+
+// GET /api/admin/products/search - Advanced product search
+router.get('/search',
+  AdminValidation.createValidationMiddleware('productSearchQuery', { source: 'query' }),
+  async (req, res) => {
+    try {
+      const { q: searchTerm, ...filters } = req.query;
+
+      const products = Product.searchAdmin(searchTerm, {
+        category: filters.category ? parseInt(filters.category) : null,
+        status: filters.status,
+        priceMin: filters.price_min ? parseInt(filters.price_min) : null,
+        priceMax: filters.price_max ? parseInt(filters.price_max) : null,
+        hasImage: filters.has_image !== undefined ? filters.has_image === 'true' : null,
+        hasSku: filters.has_sku !== undefined ? filters.has_sku === 'true' : null
+      });
+
+      res.json({
+        data: products,
+        total: products.length,
+        search_term: searchTerm,
+        filters
+      });
+    } catch (error) {
+      console.error('Error searching products:', error);
+      res.status(500).json({
+        error: 'Internal Server Error',
+        message: 'Failed to search products'
+      });
+    }
+  }
+);
+
 // GET /api/admin/products/:id - Get single product for editing
 router.get('/:id',
   AdminValidation.createValidationMiddleware('idParam', { source: 'params' }),
@@ -56,7 +123,7 @@ router.get('/:id',
     try {
       const { id } = req.params;
       const product = ProductManagement.findById(parseInt(id));
-      
+
       if (!product) {
         return res.status(404).json({
           error: 'Not Found',
@@ -211,40 +278,6 @@ router.delete('/bulk',
   }
 );
 
-// GET /api/admin/products/stats/inventory - Get inventory statistics
-router.get('/stats/inventory', async (req, res) => {
-  try {
-    const stats = ProductManagement.getInventoryStats();
-    res.json(stats);
-  } catch (error) {
-    console.error('Error fetching inventory stats:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to fetch inventory statistics'
-    });
-  }
-});
-
-// GET /api/admin/products/low-stock - Get low stock products
-router.get('/low-stock', async (req, res) => {
-  try {
-    const threshold = req.query.threshold ? parseInt(req.query.threshold) : 5;
-    const products = Product.getLowStockProducts(threshold);
-    
-    res.json({
-      data: products,
-      threshold,
-      total: products.length
-    });
-  } catch (error) {
-    console.error('Error fetching low stock products:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to fetch low stock products'
-    });
-  }
-});
-
 // POST /api/admin/products/:id/upload-image - Upload product image
 router.post('/:id/upload-image',
   AdminValidation.createValidationMiddleware('idParam', { source: 'params' }),
@@ -366,38 +399,6 @@ router.patch('/:id/inventory',
       res.status(500).json({
         error: 'Internal Server Error',
         message: 'Failed to update inventory'
-      });
-    }
-  }
-);
-
-// GET /api/admin/products/search - Advanced product search
-router.get('/search',
-  AdminValidation.createValidationMiddleware('productSearchQuery', { source: 'query' }),
-  async (req, res) => {
-    try {
-      const { q: searchTerm, ...filters } = req.query;
-      
-      const products = Product.searchAdmin(searchTerm, {
-        category: filters.category ? parseInt(filters.category) : null,
-        status: filters.status,
-        priceMin: filters.price_min ? parseInt(filters.price_min) : null,
-        priceMax: filters.price_max ? parseInt(filters.price_max) : null,
-        hasImage: filters.has_image !== undefined ? filters.has_image === 'true' : null,
-        hasSku: filters.has_sku !== undefined ? filters.has_sku === 'true' : null
-      });
-
-      res.json({
-        data: products,
-        total: products.length,
-        search_term: searchTerm,
-        filters
-      });
-    } catch (error) {
-      console.error('Error searching products:', error);
-      res.status(500).json({
-        error: 'Internal Server Error',
-        message: 'Failed to search products'
       });
     }
   }

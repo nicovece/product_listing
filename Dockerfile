@@ -11,15 +11,16 @@ RUN pnpm run build
 FROM node:20-slim AS production
 WORKDIR /app
 
-# Install pnpm and build tools for better-sqlite3
-RUN npm install -g pnpm && apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+# Install build tools for better-sqlite3 native bindings
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
-# Install backend dependencies
-COPY backend/package.json backend/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+# Install backend dependencies with npm (ensures native modules compile)
+COPY backend/package.json ./
+RUN npm install --omit=dev
 
-# Copy backend source
+# Copy backend source and seed database
 COPY backend/src ./src
+COPY backend/products.db ./products.db.seed
 
 # Copy frontend build output
 COPY --from=frontend-build /app/frontend/dist ./public
