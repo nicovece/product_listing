@@ -76,3 +76,8 @@ memory/
 
 # Keep the SQLite database for demo purposes
 # products.db is intentionally included
+*.db-shm
+*.db-wal
+
+# Frontend build output
+frontend/dist/
