@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Database connection
-const dbPath = path.join(__dirname, '../../products.db');
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../products.db');
 const db = new Database(dbPath);
 
 // Read and execute schema

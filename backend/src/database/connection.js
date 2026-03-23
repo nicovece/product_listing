@@ -2,8 +2,8 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-// Database file path
-const dbPath = path.join(__dirname, '../../products.db');
+// Database file path — configurable for production volumes
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../products.db');
 
 // Create database connection
 const db = new Database(dbPath, {

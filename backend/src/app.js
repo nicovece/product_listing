@@ -43,6 +43,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Serve frontend static files in production
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
+
 // Validation error handling middleware
 app.use(handleValidationErrors);
 
@@ -55,12 +59,16 @@ app.use((error, req, res, next) => {
   });
 });
 
-// 404 handler
+// Serve frontend for non-API routes (SPA client-side routing)
 app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'NOT_FOUND',
-    message: `Route ${req.method} ${req.originalUrl} not found`
-  });
+  const indexPath = path.join(publicPath, 'index.html');
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(404).json({
+      error: 'NOT_FOUND',
+      message: `Route ${req.method} ${req.originalUrl} not found`
+    });
+  }
+  res.sendFile(indexPath);
 });
 
 const PORT = process.env.PORT || 3001;
